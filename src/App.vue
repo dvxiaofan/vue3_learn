@@ -1,15 +1,22 @@
-<script setup>
+<script>
 
-import { ref } from 'vue';
+export default {
+  data() {
+    return {
+      message: 'HELLO XIAOFAN',
+    }
+  },
 
-const message = ref('HELLO CCYOU');
+  methods: {
+    reverseMessage() {
+      this.message = this.message.split('').reverse().join('')
+    },
 
-function reverseMessage() {
-  message.value = message.value.split('').reverse().join('');
-}
+    notify() {
+      alert('lslkajfl;kajs;fkj;fkjsa;flk')
+    },
 
-function notify() {
-  alert('Navigation was prevented');
+  },
 }
 
 </script>
