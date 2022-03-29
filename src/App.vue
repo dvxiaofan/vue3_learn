@@ -1,16 +1,24 @@
-<script setup>
-import { ref } from 'vue'
+<script>
 
-const message = ref('This is title message')
-const isRed = ref(true)
-const color = ref('green')
+export default {
+  data() {
+    return {
+      message: 'Options message',
+      isRed: true,
+      color: 'blue',
+    }
+  },
 
-function toggleRed() {
-  isRed.value = !isRed.value
-}
+  methods: {
+    toggleRed() {
+      this.isRed = !this.isRed
+    },
 
-function toggleColor() {
-  color.value = color.value === 'green' ? 'blue' : 'green'
+    toggleColor() {
+      this.color = this.color === 'blue' ? 'green' : 'blue'
+    },
+  },
+
 }
 
 </script>
