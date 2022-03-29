@@ -1,39 +1,44 @@
-<script>
+<script setup>
+import { ref } from 'vue'
 
-export default {
-  data() {
-    return {
-      message: 'HELLO XIAOFAN',
-    }
-  },
+const message = ref('This is title message')
+const isRed = ref(true)
+const color = ref('green')
 
-  methods: {
-    reverseMessage() {
-      this.message = this.message.split('').reverse().join('')
-    },
+function toggleRed() {
+  isRed.value = !isRed.value
+}
 
-    notify() {
-      alert('lslkajfl;kajs;fkj;fkjsa;flk')
-    },
-
-  },
+function toggleColor() {
+  color.value = color.value === 'green' ? 'blue' : 'green'
 }
 
 </script>
 
 <template>
-  <h1>{{ message }}</h1>
+  <p>
+    <span :title="message">
+      Hover me to show my title
+    </span>
+  </p>
 
-  <button @click="reverseMessage">翻转字符串</button>
+  <p :class="{red: isRed}" @click="toggleRed">
+    This red color? Click me
+  </p>
 
-  <button @click="message += '!'">添加！</button>
+  <p :style="{color}" @click="toggleColor">
+    What color me now? Click to toggle
+  </p>
 
-  <a href="https://github.com" @click.prevent="notify">Go</a>
 </template>
 
 <style>
 button, a {
   display: block;
   margin-bottom: 1em;
+}
+
+.red {
+  color: red
 }
 </style>
