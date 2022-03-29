@@ -2,35 +2,77 @@
 export default {
   data() {
     return {
-      isShow: false,
-      list: [1, 2, 3, 4, 5],
+      text: 'Edit me',
+      checked: true,
+      checkedNames: ['Jack'],
+      picked: 'One',
+      selected: 'A',
+      multiSelected: ['A'],
     }
   },
 }
 </script>
 
 <template>
-  <button @click="isShow = !isShow">Toggle show list</button>
-  <button @click="list.push(list.length+1)">Push Number</button>
-  <button @click="list.pop()">Pop Number</button>
-  <button @click="list.reverse()">Reverse Number</button>
+  <h2>Text Input</h2>
+  <input v-model="text">
+  {{ text }}
 
-  <ul v-if="isShow && list.length">
-    <li v-for="item of list">{{ item }}</li>
-  </ul>
+  <h2>Checkbox</h2>
+  <input type="checkbox" v-model="checked" id="checkbox">
+  <label for="checkbox">Checked: {{ checked }}</label>
 
-  <p v-else-if="list.length">List is not empty, but had hidden</p>
-  <p v-else>List is Empty</p>
+  <h2>Multi Checkbox</h2>
+  <input type="checkbox" v-model="checkedNames" id="jack" value="Jack">
+  <label for="jack">Jack</label>
+
+  <input type="checkbox" v-model="checkedNames" id="ccyou" value="CCYOU">
+  <label for="ccyou">CCYOU</label>
+
+  <input type="checkbox" v-model="checkedNames" id="mike" value="MIKE">
+  <label for="mike">MIKE</label>
+
+  <p>Checked names:
+  <pre>{{ checkedNames }}</pre>
+  </p>
+
+  <h2>Radio</h2>
+
+  <input type="radio" v-model="picked" id="one" value="ONE">
+  <label for="one">ONE</label>
+  <br>
+  <input type="radio" v-model="picked" id="two" value="TWO">
+  <label for="two">TWO</label>
+  <br>
+
+  <span>Picked: {{ picked }}</span>
+
+  <h2>Select</h2>
+  <select v-model="selected">
+    <option disabled value="">Please select one</option>
+    <option>A</option>
+    <option>B</option>
+    <option>C</option>
+    <option>D</option>
+    <option>E</option>
+  </select>
+  <br>
+  <span>Selected: {{ selected }}</span>
+
+  <h2>Multi Select</h2>
+  <select multiple v-model="multiSelected" style="width: 100px">
+    <option>A</option>
+    <option>B</option>
+    <option>C</option>
+    <option>D</option>
+    <option>E</option>
+  </select>
+  <br>
+  <span>Multi Selected: {{ multiSelected }}</span>
 
 </template>
 
 <style>
-button, a {
-  display: block;
-  margin-bottom: 1em;
-}
 
-.red {
-  color: red
-}
+
 </style>
