@@ -1,23 +1,20 @@
 <script setup>
 import { ref } from 'vue'
+import HelloWorld from '@/components/HelloWorld.vue'
 
-const text = ref('old text')
-const isChecked = ref(true)
-
-
+const todoList = ref([
+  {id: 0, text: 'Vegetables'},
+  {id: 1, text: 'Cheese'},
+  {id: 2, text: 'Whatever else humans are supposed to eat'},
+])
 </script>
 
 <template>
-  <h2>Input Text</h2>
-  <input type="text" v-model="text">
-  <br>
-  <span>Input text is: {{text}}</span>
-
-  <h2>Checkbox</h2>
-  <input type="checkbox" v-model="isChecked">
-  <br>
-  <span>Checked: {{isChecked}}</span>
-
-
-
+  <ol>
+    <HelloWorld
+        v-for="item in todoList"
+        :todo="item"
+        :key="item.id"
+    ></HelloWorld>
+  </ol>
 </template>
