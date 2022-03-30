@@ -1,53 +1,22 @@
 <script setup>
-import { computed, ref } from 'vue'
-import { debounce } from 'lodash-es'
-import { marked } from 'marked'
+import DemoGrid from '@/components/Grid.vue'
+import { ref } from 'vue'
 
-const input = ref('# 一级标题')
-const output = computed(() => marked(input.value))
-const update = debounce((e) => {
-  input.value = e.target.value
-}, 100)
-
+const searchQuery = ref('')
+const gridColumns = ['name', 'power']
+const gridData = [
+  {name: 'CC You', power: Infinity},
+  {name: 'XF fan', power: 9000},
+  {name: 'dd kao', power: 7000},
+  {name: 'rr you', power: 8000},
+]
 </script>
 
 <template>
-  <div class="editor">
-    <textarea class="input" :value="input" @input="update"></textarea>
-    <div class="output" v-html="output"></div>
-  </div>
+  <form id="search">
+    Search <input name="query" v-model="searchQuery">
+  </form>
+
+  <DemoGrid :data="gridData" :columns="gridColumns"
+            :filter-key="searchQuery"></DemoGrid>
 </template>
-
-<style>
-body {
-  margin: 0;
-}
-
-.editor {
-  height: 100vh;
-  display: flex;
-}
-
-.input, .output {
-  overflow: auto;
-  width: 50%;
-  height: 100%;
-  box-sizing: border-box;
-  padding: 0 20px;
-}
-
-.input {
-  border: none;
-  border-right: 1px solid #ccc;
-  resize: none;
-  outline: none;
-  background-color: #f6f6f6;
-  font-size: 14px;
-  font-family: 'Monaco', courier, monospace;
-  padding: 20px;
-}
-
-code {
-  color: #f66;
-}
-</style>
