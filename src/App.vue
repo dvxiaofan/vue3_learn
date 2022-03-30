@@ -1,20 +1,53 @@
 <script setup>
-import { ref } from 'vue'
-import HelloWorld from '@/components/HelloWorld.vue'
+import { computed, ref } from 'vue'
+import { debounce } from 'lodash-es'
+import { marked } from 'marked'
 
-const todoList = ref([
-  {id: 0, text: 'Vegetables'},
-  {id: 1, text: 'Cheese'},
-  {id: 2, text: 'Whatever else humans are supposed to eat'},
-])
+const input = ref('# 一级标题')
+const output = computed(() => marked(input.value))
+const update = debounce((e) => {
+  input.value = e.target.value
+}, 100)
+
 </script>
 
 <template>
-  <ol>
-    <HelloWorld
-        v-for="item in todoList"
-        :todo="item"
-        :key="item.id"
-    ></HelloWorld>
-  </ol>
+  <div class="editor">
+    <textarea class="input" :value="input" @input="update"></textarea>
+    <div class="output" v-html="output"></div>
+  </div>
 </template>
+
+<style>
+body {
+  margin: 0;
+}
+
+.editor {
+  height: 100vh;
+  display: flex;
+}
+
+.input, .output {
+  overflow: auto;
+  width: 50%;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 0 20px;
+}
+
+.input {
+  border: none;
+  border-right: 1px solid #ccc;
+  resize: none;
+  outline: none;
+  background-color: #f6f6f6;
+  font-size: 14px;
+  font-family: 'Monaco', courier, monospace;
+  padding: 20px;
+}
+
+code {
+  color: #f66;
+}
+</style>
