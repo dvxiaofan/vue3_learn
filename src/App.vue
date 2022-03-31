@@ -1,84 +1,159 @@
 <script setup>
-import PolyGraph from '@/components/PolyGraph.vue'
-import { ref, reactive } from 'vue'
+import { ref, computed, watchEffect } from 'vue'
 
-const newLabel = ref('')
-const stats = reactive([
-  {label: 'A', value: 100},
-  {label: 'B', value: 100},
-  {label: 'C', value: 100},
-  {label: 'D', value: 100},
-  {label: 'E', value: 100},
-  {label: 'F', value: 100},
-])
+const STORAGE_KEY = 'vue-todomvc'
 
-const add = (e) => {
-  e.preventDefault()
-  if (!newLabel.value) return
-  stats.push({
-    label: newLabel.value,
-    value: 100,
-  })
-  newLabel.value = ''
+const filters = {
+  all: (todos) => todos,
+  active: (todos) => todos.filter((todo) => !todo.completed),
+  completed: (todos) => todos.filter((todo) => todo.completed),
 }
 
-const remove = (stat) => {
-  if (stats.length > 3) {
-    stats.splice(stats.indexOf(stat), 1)
+// state
+const todos = ref(JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'))
+const visibility = ref('all')
+const editedTodo = ref()
+
+// derived state
+const filteredTodos = computed(() => filters[visibility.value](todos.value))
+const remaining = computed(() => filters.active(todos.value).length)
+
+// handle routing
+window.addEventListener('hashchange', onHashChange)
+onHashChange()
+
+// persist state
+watchEffect(() => {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(todos.value))
+})
+
+function toggleAll(e) {
+  todos.value.forEach((todo) => (todo.completed = e.target.checked))
+}
+
+function addTodo(e) {
+  const value = e.target.value.trim()
+  if (value) {
+    todos.value.push({
+      id: Date.now(),
+      title: value,
+      completed: false,
+    })
+    e.target.value = ''
+  }
+}
+
+function removeTodo(todo) {
+  todos.value.splice(todos.value.indexOf(todo), 1)
+}
+
+let beforeEditCache = ''
+
+function editTodo(todo) {
+  beforeEditCache = todo.title
+  editedTodo.value = todo
+}
+
+function cancelEdit(todo) {
+  editedTodo.value = null
+  todo.title = beforeEditCache
+}
+
+function doneEdit(todo) {
+  if (editedTodo.value) {
+    editedTodo.value = null
+    todo.title = todo.title.trim()
+    if (!todo.title) removeTodo(todo)
+  }
+}
+
+function removeCompleted() {
+  todos.value = filters.active(todos.value)
+}
+
+function onHashChange() {
+  const route = window.location.hash.replace(/#\/?/, '')
+  if (filters[route]) {
+    visibility.value = route
   } else {
-    alert("Can't delete more")
+    window.location.hash = ''
+    visibility.value = 'all'
   }
 }
 </script>
 
 <template>
-  <svg width="200" height="200">
-    <PolyGraph :stats="stats"></PolyGraph>
-  </svg>
-
-  <!-- controls -->
-  <div v-for="stat in stats">
-    <label>{{ stat.label }}</label>
-    <input type="range" v-model="stat.value" min="0" max="100">
-    <button @click="remove(stat)" class="remove">X</button>
-  </div>
-
-  <form id="add">
-    <input name="newLabel" v-model="newLabel">
-    <button @click="add">Add a Stat</button>
-  </form>
-
-  <pre id="raw">{{ stats }}</pre>
-
+  <section class="todoapp">
+    <header class="header">
+      <h1>todos</h1>
+      <input
+          class="new-todo"
+          autofocus
+          placeholder="What needs to be done?"
+          @keyup.enter="addTodo"
+      >
+    </header>
+    <section class="main" v-show="todos.length">
+      <input
+          id="toggle-all"
+          class="toggle-all"
+          type="checkbox"
+          :checked="remaining === 0"
+          @change="toggleAll"
+      >
+      <label for="toggle-all">Mark all as complete</label>
+      <ul class="todo-list">
+        <li
+            v-for="todo in filteredTodos"
+            class="todo"
+            :key="todo.id"
+            :class="{ completed: todo.completed, editing: todo === editedTodo }"
+        >
+          <div class="view">
+            <input class="toggle" type="checkbox" v-model="todo.completed">
+            <label @dblclick="editTodo(todo)">{{ todo.title }}</label>
+            <button class="destroy" @click="removeTodo(todo)"></button>
+          </div>
+          <input
+              v-if="todo === editedTodo"
+              class="edit"
+              type="text"
+              v-model="todo.title"
+              @vnode-mounted="({ el }) => el.focus()"
+              @blur="doneEdit(todo)"
+              @keyup.enter="doneEdit(todo)"
+              @keyup.escape="cancelEdit(todo)"
+          >
+        </li>
+      </ul>
+    </section>
+    <footer class="footer" v-show="todos.length">
+      <span class="todo-count">
+        <strong>{{ remaining }}</strong>
+        <span>{{ remaining === 1 ? 'item' : 'items' }} left</span>
+      </span>
+      <ul class="filters">
+        <li>
+          <a href="#/all" :class="{ selected: visibility === 'all' }">All</a>
+        </li>
+        <li>
+          <a href="#/active" :class="{ selected: visibility === 'active' }">Active</a>
+        </li>
+        <li>
+          <a href="#/completed"
+             :class="{ selected: visibility === 'completed' }">Completed</a>
+        </li>
+      </ul>
+      <button class="clear-completed" @click="removeCompleted"
+              v-show="todos.length > remaining">
+        Clear completed
+      </button>
+    </footer>
+  </section>
 </template>
 
 <style>
-polygon {
-  fill: #42b983;
-  opacity: 0.75;
-}
-
-circle {
-  fill: transparent;
-  stroke: #999;
-}
-
-text {
-  font-size: 10px;
-  fill: #666;
-}
-
-label {
-  display: inline-block;
-  margin-left: 10px;
-  width: 20px;
-}
-
-#raw {
-  position: absolute;
-  top: 0;
-  left: 300px;
-}
+@import './index.css';
 </style>
 
 
